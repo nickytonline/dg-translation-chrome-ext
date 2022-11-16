@@ -1,7 +1,6 @@
 import { content } from './content-script';
 
 loadApiKey()
-showLatestTranscript()
 
 document.getElementById('start')?.addEventListener('click', async () => {
     const tab = await getCurrentTab()
@@ -18,25 +17,12 @@ document.getElementById('stop')?.addEventListener('click', async () => {
     chrome.tabs.sendMessage(tab.id, { message: 'stop' })
 })
 
-chrome.runtime.onMessage.addListener(({ message }) => {
-    if(message == 'transcriptavailable') {
-        showLatestTranscript()
-    }
-})
-
 function loadApiKey() {
     chrome.storage.local.get('key').then(({ key }) => {
         const apiKeyElem = document.getElementById('api-key') as HTMLInputElement | null
         if (apiKeyElem) {
             apiKeyElem.value = key
         }
-    })
-}
-
-function showLatestTranscript() {
-    chrome.storage.local.get("transcript", ({ transcript }) => {
-       document.getElementById('transcript').innerHTML = transcript;
-       transcript && document.getElementById('clear')?.removeAttribute('disabled');
     })
 }
 

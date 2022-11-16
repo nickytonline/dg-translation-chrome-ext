@@ -2,9 +2,17 @@ export const content = () => {
 
 let apiKey
 let socket
+let transcriptionArea
 chrome.storage.local.set({ transcript: '' })
 chrome.storage.local.get('key', ({ key }) => apiKey = key)
 
+function showLatestTranscript(text) {
+    // chrome.storage.local.get("transcript", ({ transcript }) => {
+    //     console.log(transcript)
+       transcriptionArea.textContent += text;
+    //    transcript && document.getElementById('clear')?.removeAttribute('disabled');
+    // })
+}
 
 //Add microphone access
 navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then((stream) => {
@@ -17,6 +25,19 @@ navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then((strea
         mimeType: 'audio/webm',
     })
 
+    if (!transcriptionArea) {
+        transcriptionArea = document.createElement('output')
+        transcriptionArea.style.position = 'absolute'
+        transcriptionArea.style.zIndex = 999999
+        transcriptionArea.style.backgroundColor = 'black'
+        transcriptionArea.style.color = 'white'
+        transcriptionArea.style.padding = '10px'
+        transcriptionArea.style.fontSize = '1.5rem'
+        transcriptionArea.style.width = "600px"
+        transcriptionArea.style.height = "400px"
+
+        document.body.appendChild(transcriptionArea)
+    }
 //create a websocket connection
 
     socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=general-enhanced&punctuate=true', ['token', apiKey])
@@ -37,10 +58,9 @@ navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then((strea
 
         if (transcript) {
             chrome.storage.local.get('transcript', data => {
-                chrome.storage.local.set({ transcript: data.transcript += ' ' + transcript })
+                // chrome.storage.local.set({ transcript: data.transcript += ' ' + transcript })
 
-                // Throws error when popup is closed, so this swallows the errors.
-                chrome.runtime.sendMessage({ message: 'transcriptavailable' }).catch(err => ({}))
+                showLatestTranscript(data.transcript += ' ' + transcript)
             })
         }
     }
