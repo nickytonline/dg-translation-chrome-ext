@@ -7,12 +7,14 @@
     "permissions": ["storage", "tabs", "scripting"],
     "content_scripts": [{
         "matches": ["*://github.com/parcel-bundler/*"],
-
-        "js": ["content-script.ts"]
+        "js": ["content-script.ts", "options.ts"]
     }],
     "action": {
         "default_popup": "popup.html",
         "default_icon": "social-logo.png"
     },
-    "options_page": "options.html"
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    }
 }
